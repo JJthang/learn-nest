@@ -7,10 +7,15 @@ import {
   ParseBoolPipe,
   Patch,
   Post,
+  Put,
   Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
+import { UserDto } from 'src/common/dto/form.dto';
+import { ParamIdDto } from 'src/common/dto/param.dto';
 
 @Controller('user')
 export class UserController {
@@ -20,8 +25,15 @@ export class UserController {
   ) {}
 
   @Post()
-  create(@Body() createUserDto: any) {
+  @UsePipes(new ValidationPipe())
+  // whitelist: loại bỏ các trường không nằm trong CreateUserDto
+  create(@Body() createUserDto: UserDto) {
     return this.userService.create(createUserDto);
+  }
+  @Put()
+  @UsePipes(new ValidationPipe())
+  updateUser(@Body() dto: UserDto) {
+    return { message: 'User updated', data: dto };
   }
 
   @Get()
@@ -31,20 +43,17 @@ export class UserController {
     console.log('====================================');
     return this.userService.findAll(query.id);
   }
-
+  // , @Query('chart', ParseBoolPipe) chart: boolean
   @Get(':id')
-  findOne(
-    @Param('id') id: string,
-    @Query('chart', ParseBoolPipe) chart: boolean,
-  ) {
+  findOne(@Param() { id }: ParamIdDto) {
     console.log('====================================');
-    console.log(typeof id, typeof chart, id, chart);
+    console.log(id);
     console.log('====================================');
-    return this.authService.getAuth(+id, chart);
+    return this.authService.getAuth(id, true);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: any) {
+  update(@Param('id') id: any, @Body() updateUserDto: any) {
     return this.userService.update(+id, updateUserDto);
   }
 

@@ -2,8 +2,15 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: any) {
-    return `This action adds a new user ${createUserDto} `;
+  create(createUserDto: {
+    username?: string;
+    email?: string;
+    password?: string;
+  }) {
+    return createUserDto;
+  }
+  update(id: number, updateUserDto: any) {
+    return `This action updates a #id user id: ${id}, updateUserDto: ${updateUserDto} `;
   }
 
   findAll(id: number) {
@@ -15,10 +22,6 @@ export class UserService {
 
   findOne(id: number) {
     return `This action returns a #id user ${id} `;
-  }
-
-  update(id: number, updateUserDto: any) {
-    return `This action updates a #id user id: ${id}, updateUserDto: ${updateUserDto} `;
   }
 
   remove(id: number) {
