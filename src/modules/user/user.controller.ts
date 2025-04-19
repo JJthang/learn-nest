@@ -3,8 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   Param,
-  ParseBoolPipe,
   Patch,
   Post,
   Put,
@@ -16,6 +16,9 @@ import { UserService } from './user.service';
 import { AuthService } from './auth.service';
 import { UserDto } from 'src/common/dto/form.dto';
 import { ParamIdDto } from 'src/common/dto/param.dto';
+import { HeaderDto } from 'src/common/dto/header.dto';
+import { Request } from 'express';
+import { createUserDto } from 'src/common/dto/colums/user/create.user.dto';
 
 @Controller('user')
 export class UserController {
@@ -24,11 +27,16 @@ export class UserController {
     private readonly authService: AuthService,
   ) {}
 
-  @Post()
+  @Post('create')
   @UsePipes(new ValidationPipe())
   // whitelist: loại bỏ các trường không nằm trong CreateUserDto
-  create(@Body() createUserDto: UserDto) {
-    return this.userService.create(createUserDto);
+  async create(@Body() createUserDto: createUserDto) {
+    console.log('createUserDto : ', createUserDto);
+
+    await this.userService.create(createUserDto);
+    return {
+      message: 'create success fully',
+    };
   }
   @Put()
   @UsePipes(new ValidationPipe())
@@ -52,9 +60,28 @@ export class UserController {
     return this.authService.getAuth(id, true);
   }
 
+  // @Patch(':id')
+  // update(@Param('id') id: any, @Body() updateUserDto: any) {
+  //   return this.userService.update(+id, updateUserDto);
+  // }
+
+  // @Req() req: Request,
   @Patch(':id')
-  update(@Param('id') id: any, @Body() updateUserDto: any) {
-    return this.userService.update(+id, updateUserDto);
+  update(
+    @Param('id') id: number,
+    @Body() body: { username: string; email: string; password: string },
+    // @RequestHeader(
+    //   new ValidationPipe({
+    //     whitelist: true,
+    //     validateCustomDecorators: true,
+    //   }),
+    // )
+    header: HeaderDto,
+  ) {
+    console.log('====================================');
+    console.log('req headers: ', header);
+    console.log('====================================');
+    return this.userService.update(+id, body);
   }
 
   @Delete(':id')

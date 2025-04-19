@@ -1,16 +1,25 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { createUserDto } from 'src/common/dto/colums/user/create.user.dto';
+import { User } from './entity/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: {
-    username?: string;
-    email?: string;
-    password?: string;
-  }) {
-    return createUserDto;
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+  ) {}
+  async create(createUserDto: createUserDto): Promise<User> {
+    const newUser = this.userRepository.create(createUserDto);
+    return await this.userRepository.save(newUser);
   }
+
   update(id: number, updateUserDto: any) {
-    return `This action updates a #id user id: ${id}, updateUserDto: ${updateUserDto} `;
+    return {
+      message: `This action updates a #id user id: ${id}, updateUserDto: ${updateUserDto} `,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      data: updateUserDto,
+    };
   }
 
   findAll(id: number) {
