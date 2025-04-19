@@ -31,8 +31,6 @@ export class UserController {
   @UsePipes(new ValidationPipe())
   // whitelist: loại bỏ các trường không nằm trong CreateUserDto
   async create(@Body() createUserDto: createUserDto) {
-    console.log('createUserDto : ', createUserDto);
-
     await this.userService.create(createUserDto);
     return {
       message: 'create success fully',
@@ -46,17 +44,11 @@ export class UserController {
 
   @Get()
   findAll(@Query() query: { id: number }) {
-    console.log('====================================');
-    console.log('this ', query.id);
-    console.log('====================================');
     return this.userService.findAll(query.id);
   }
   // , @Query('chart', ParseBoolPipe) chart: boolean
   @Get(':id')
   findOne(@Param() { id }: ParamIdDto) {
-    console.log('====================================');
-    console.log(id);
-    console.log('====================================');
     return this.authService.getAuth(id, true);
   }
 
