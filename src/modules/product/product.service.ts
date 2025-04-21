@@ -13,7 +13,6 @@ export class ProductService {
   ) {}
   async create(createProductDto: createProductDto): Promise<Product> {
     const result = this.userRepository.create(createProductDto);
-    console.log('result : ', result);
     return await this.userRepository.save(result);
   }
 

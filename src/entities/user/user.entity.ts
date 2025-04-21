@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Profile } from '../profile/profile.entity';
 
 @Entity()
 export class User {
@@ -15,4 +22,9 @@ export class User {
     unique: true,
   })
   email: string;
+
+  // JoinColumn() đánh dấu đây là cột chứa khóa ngoại
+  @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
+  @JoinColumn()
+  profile: Profile;
 }

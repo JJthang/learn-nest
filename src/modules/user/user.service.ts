@@ -22,10 +22,12 @@ export class UserService {
     };
   }
 
-  findAll(id: number) {
+  async findAll(id: number) {
+    const users = await this.userRepository.find({ relations: ['profile'] });
     return {
       status: 200,
       message: `This action returns all users   id : ${id}`,
+      data: users,
     };
   }
 
