@@ -19,6 +19,7 @@ import { ParamIdDto } from 'src/common/dto/param.dto';
 import { HeaderDto } from 'src/common/dto/header.dto';
 import { Request } from 'express';
 import { createUserDto } from 'src/common/dto/colums/user/create.user.dto';
+import { paginationTdo } from 'src/common/dto/pagination.tdo';
 
 @Controller('user')
 export class UserController {
@@ -43,8 +44,8 @@ export class UserController {
   }
 
   @Get()
-  findAll(@Query() query: { id: number }) {
-    return this.userService.findAll(query.id);
+  findAll(@Query() query: paginationTdo) {
+    return this.userService.findAll(query);
   }
   // , @Query('chart', ParseBoolPipe) chart: boolean
   @Get(':id')
