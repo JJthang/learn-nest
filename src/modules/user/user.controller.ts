@@ -49,7 +49,7 @@ export class UserController {
   // , @Query('chart', ParseBoolPipe) chart: boolean
   @Get(':id')
   findOne(@Param() { id }: ParamIdDto) {
-    return this.authService.getAuth(id, true);
+    return this.userService.findOneWithPosts(id);
   }
 
   // @Patch(':id')

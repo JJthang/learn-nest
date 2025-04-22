@@ -6,13 +6,18 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfigAsync } from './configs/database.config';
 import { ProductModule } from './modules/product/product.module';
+import { User } from './entities/user/user.entity';
+import { Post } from './entities/post/post.entity';
+import { PostModule } from './modules/post/post.module';
 
 @Module({
   imports: [
     UserModule,
     ProductModule,
+    PostModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
+    TypeOrmModule.forFeature([User, Post]),
   ],
   controllers: [AppController],
   providers: [AppService],
