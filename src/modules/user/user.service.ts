@@ -49,6 +49,16 @@ export class UserService {
     return user;
   }
 
+  async findByEmaiL(email: string) {
+    const user = await this.userRepository.findOne({
+      where: { email },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
   remove(id: number) {
     return `This action removes a #id user  id: ${id} `;
   }

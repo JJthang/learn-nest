@@ -9,13 +9,18 @@ import { ProductModule } from './modules/product/product.module';
 import { User } from './entities/user/user.entity';
 import { Post } from './entities/post/post.entity';
 import { PostModule } from './modules/post/post.module';
+import { AuthModule } from './modules/common/auth/auth.module';
 
 @Module({
   imports: [
     UserModule,
     ProductModule,
     PostModule,
-    ConfigModule.forRoot(),
+    AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env.local', '.env.development', '.env'],
+    }),
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
     TypeOrmModule.forFeature([User, Post]),
   ],

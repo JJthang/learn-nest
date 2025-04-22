@@ -13,7 +13,6 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { AuthService } from './auth.service';
 import { UserDto } from 'src/common/dto/form.dto';
 import { ParamIdDto } from 'src/common/dto/param.dto';
 import { HeaderDto } from 'src/common/dto/header.dto';
@@ -23,10 +22,7 @@ import { paginationTdo } from 'src/common/dto/pagination.tdo';
 
 @Controller('user')
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   @Post('create')
   @UsePipes(new ValidationPipe())
