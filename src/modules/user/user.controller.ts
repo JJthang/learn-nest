@@ -3,12 +3,12 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   Param,
   Patch,
   Post,
   Put,
   Query,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -16,9 +16,9 @@ import { UserService } from './user.service';
 import { UserDto } from 'src/common/dto/form.dto';
 import { ParamIdDto } from 'src/common/dto/param.dto';
 import { HeaderDto } from 'src/common/dto/header.dto';
-import { Request } from 'express';
 import { createUserDto } from 'src/common/dto/colums/user/create.user.dto';
 import { paginationTdo } from 'src/common/dto/pagination.tdo';
+import { jwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -39,6 +39,7 @@ export class UserController {
     return { message: 'User updated', data: dto };
   }
 
+  @UseGuards(jwtAuthGuard)
   @Get()
   findAll(@Query() query: paginationTdo) {
     return this.userService.findAll(query);

@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import { UserService } from 'src/modules/user/user.service';
 
@@ -9,10 +10,12 @@ interface CreateAuthDto {
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService) {}
-  create(createAuthDto: { id: string }) {
-    console.log('createAuthDto : ', createAuthDto);
-    return createAuthDto;
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+  ) {}
+  login(createAuthDto: { id: string }) {
+    return this.jwtService.sign({ sub: createAuthDto.id });
   }
 
   findAll() {

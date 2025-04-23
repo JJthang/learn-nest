@@ -30,7 +30,11 @@ export class AuthController {
     @Request() req: { user: { id: string } },
     @Body() createAuthDto: CreateAuthDto,
   ) {
-    return this.authService.create(req.user);
+    const token = this.authService.login(req.user);
+    return {
+      id: req.user.id,
+      token: token,
+    };
   }
 
   @Get()
