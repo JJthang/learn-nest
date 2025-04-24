@@ -8,11 +8,13 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
+import { RefreshAuthGuard } from 'src/common/guards/refresh-auth/refresh-auth.guard';
 
 interface CreateAuthDto {
   email: string;
@@ -30,11 +32,15 @@ export class AuthController {
     @Request() req: { user: { id: string } },
     @Body() createAuthDto: CreateAuthDto,
   ) {
-    const token = this.authService.login(req.user);
-    return {
-      id: req.user.id,
-      token: token,
-    };
+    return this.authService.login(req.user);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(RefreshAuthGuard)
+  @Post('refresh-token')
+  refreshToken(@Req() req: { user: { id: string } }) {
+    console.log('req : ', req.user);
+    return this.authService.refreshToken(req.user.id);
   }
 
   @Get()
