@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import refreshJwtConfig from 'src/configs/refresh-jwt.config';
 import { UserService } from 'src/modules/user/user.service';
+import * as argon2 from 'argon2';
 
 interface CreateAuthDto {
   email: string;
@@ -18,23 +19,64 @@ export class AuthService {
     @Inject(refreshJwtConfig.KEY)
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
   ) {}
-  login(createAuthDto: { id: string }) {
-    const payload = { sub: createAuthDto.id };
-    const token = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, this.refreshTokenConfig);
+
+  async login(createAuthDto: { id: number }) {
+    const { accessToken, refreshToken } = await this.generateTokens(
+      createAuthDto.id,
+    );
+    const hashedRefreshToken = await argon2.hash(refreshToken);
+    await this.userService.updateHashedRefreshToken(
+      createAuthDto.id,
+      hashedRefreshToken,
+    );
+
     return {
       id: createAuthDto.id,
-      Token: token,
+      accessToken,
       refreshToken,
     };
   }
 
-  refreshToken(id: string) {
-    const payload = { sub: id };
-    const refreshToken = this.jwtService.sign(payload, this.refreshTokenConfig);
+  async validateRefreshToken(userId: number, refreshToken: string) {
+    const user = await this.userService.findOne(userId);
+
+    if (!user || !user.hashedRefreshToken)
+      throw new UnauthorizedException('Invalid Refresh Token');
+    console.log(user.hashedRefreshToken);
+    console.log(refreshToken);
+
+    const refreshTokenMatches = await argon2.verify(
+      user.hashedRefreshToken,
+      refreshToken,
+    );
+    console.log('refreshTokenMatches : ', refreshTokenMatches);
+
+    if (!refreshTokenMatches)
+      throw new UnauthorizedException('Invalid Refresh Token');
+    return { id: userId };
+  }
+
+  async refreshToken(id: number) {
+    const { accessToken, refreshToken } = await this.generateTokens(id);
+    const hashedRefreshToken = await argon2.hash(accessToken);
+    await this.userService.updateHashedRefreshToken(id, hashedRefreshToken);
+
     return {
       id: id,
-      refreshToken: refreshToken,
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async generateTokens(userId: number) {
+    const payload = { sub: userId };
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.sign(payload),
+      this.jwtService.sign(payload, this.refreshTokenConfig),
+    ]);
+    return {
+      accessToken,
+      refreshToken,
     };
   }
 
@@ -53,19 +95,10 @@ export class AuthService {
     };
   }
 
-  findAll() {
-    return `This action returns all auths`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #id auth`;
-  }
-
-  update(id: number, updateAuthDto: CreateAuthDto) {
-    return `This action updates a #id auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #id auth`;
+  async signOut(userId: number) {
+    await this.userService.updateHashedRefreshToken(userId, null);
+    return {
+      message: 'Account logged out successfully',
+    };
   }
 }

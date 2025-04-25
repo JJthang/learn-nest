@@ -23,6 +23,9 @@ export class User {
   @Column()
   lastname: string;
 
+  @Column({ nullable: true })
+  hashedRefreshToken?: string;
+
   @Column({
     unique: true,
   })

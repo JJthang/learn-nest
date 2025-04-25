@@ -1,12 +1,7 @@
 import {
-  Body,
   Controller,
-  Delete,
-  Get,
   HttpCode,
   HttpStatus,
-  Param,
-  Patch,
   Post,
   Req,
   Request,
@@ -15,11 +10,7 @@ import {
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RefreshAuthGuard } from 'src/common/guards/refresh-auth/refresh-auth.guard';
-
-interface CreateAuthDto {
-  email: string;
-  password: string;
-}
+import { jwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -28,38 +19,22 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  create(
-    @Request() req: { user: { id: string } },
-    @Body() createAuthDto: CreateAuthDto,
-  ) {
+  create(@Request() req: { user: { id: number } }) {
     return this.authService.login(req.user);
   }
 
   @HttpCode(HttpStatus.OK)
+  @UseGuards(jwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
   @UseGuards(RefreshAuthGuard)
   @Post('refresh-token')
-  refreshToken(@Req() req: { user: { id: string } }) {
-    console.log('req : ', req.user);
+  refreshToken(@Req() req: { user: { id: number } }) {
     return this.authService.refreshToken(req.user.id);
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: CreateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  @UseGuards(jwtAuthGuard)
+  @Post('sign-out')
+  signOut(@Req() req: { user: { id: number } }) {
+    return this.authService.signOut(req.user.id);
   }
 }

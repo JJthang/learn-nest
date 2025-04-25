@@ -24,6 +24,13 @@ export class UserService {
     };
   }
 
+  async updateHashedRefreshToken(userId: number, hashedRefreshToken: any) {
+    return await this.userRepository.update(
+      { id: userId },
+      { hashedRefreshToken },
+    );
+  }
+
   async findAll(query: paginationTdo) {
     const users = await this.userRepository.find({
       relations: ['posts'],
@@ -47,6 +54,12 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
     return user;
+  }
+
+  async findOne(id: number) {
+    return this.userRepository.findOne({
+      where: { id },
+    });
   }
 
   async findByEmaiL(email: string) {
