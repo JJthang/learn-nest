@@ -5,6 +5,7 @@ import { compare } from 'bcrypt';
 import refreshJwtConfig from 'src/configs/refresh-jwt.config';
 import { UserService } from 'src/modules/user/user.service';
 import * as argon2 from 'argon2';
+import { createUserDto } from 'src/common/dto/colums/user/create.user.dto';
 
 interface CreateAuthDto {
   email: string;
@@ -84,7 +85,7 @@ export class AuthService {
     const user = await this.userService.findByEmaiL(email);
 
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException('User not found 1');
     }
     const isPasswordMatch = await compare(password, user.password as string);
     if (!isPasswordMatch) {
@@ -97,7 +98,7 @@ export class AuthService {
   async validateJwtUser(userId: number) {
     const user = await this.userService.findOne(userId);
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException('User not found 2');
     }
     const currentUser = { id: user.id, role: user.role };
     return currentUser;
@@ -108,5 +109,13 @@ export class AuthService {
     return {
       message: 'Account logged out successfully',
     };
+  }
+
+  async validateGoogleUser(user: createUserDto) {
+    const result = await this.userService.findByEmaiL(user.email);
+    if (!result) {
+      return await this.userService.create(user);
+    }
+    return result;
   }
 }

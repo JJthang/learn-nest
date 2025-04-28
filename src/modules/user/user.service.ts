@@ -51,7 +51,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not found 4');
     }
     return user;
   }
@@ -66,16 +66,16 @@ export class UserService {
     const user = await this.userRepository.findOne({
       where: { email },
     });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    // if (!user) {
+    //   throw new NotFoundException('User not found 5');
+    // }
     return user;
   }
 
   async remove(id: number) {
     const result = await this.userRepository.delete(id);
     if (!result.affected) {
-      throw new NotFoundException(`User not found`);
+      throw new NotFoundException(`User not found 6`);
     }
     return {
       message: 'Delete user successfully',

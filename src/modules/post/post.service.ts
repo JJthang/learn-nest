@@ -19,9 +19,8 @@ export class PostService {
     const user = await this.userRepository.findOneBy({
       id: createPostDto.userId,
     });
-    console.log('USER : ', user);
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('User not found 3');
 
     const post = this.postRepository.create({
       title: createPostDto.title,
