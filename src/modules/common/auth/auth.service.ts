@@ -94,6 +94,14 @@ export class AuthService {
       id: user.id,
     };
   }
+  async validateJwtUser(userId: number) {
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    const currentUser = { id: user.id, role: user.role };
+    return currentUser;
+  }
 
   async signOut(userId: number) {
     await this.userService.updateHashedRefreshToken(userId, null);

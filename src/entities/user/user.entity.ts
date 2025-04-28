@@ -11,6 +11,7 @@ import {
 import { Profile } from '../profile/profile.entity';
 import { Post } from '../post/post.entity';
 import { hash } from 'bcrypt';
+import { Role } from 'src/common/enums/role.enum';
 
 @Entity()
 export class User {
@@ -22,6 +23,13 @@ export class User {
 
   @Column()
   lastname: string;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.USER,
+  })
+  role: Role;
 
   @Column({ nullable: true })
   hashedRefreshToken?: string;

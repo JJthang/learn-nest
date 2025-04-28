@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  SetMetadata,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -19,6 +20,9 @@ import { HeaderDto } from 'src/common/dto/header.dto';
 import { createUserDto } from 'src/common/dto/colums/user/create.user.dto';
 import { paginationTdo } from 'src/common/dto/pagination.tdo';
 import { jwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard';
+import { Role } from 'src/common/enums/role.enum';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from 'src/common/guards/roles/roles.guard';
 
 @Controller('user')
 export class UserController {
@@ -60,12 +64,6 @@ export class UserController {
   update(
     @Param('id') id: number,
     @Body() body: { username: string; email: string; password: string },
-    // @RequestHeader(
-    //   new ValidationPipe({
-    //     whitelist: true,
-    //     validateCustomDecorators: true,
-    //   }),
-    // )
     header: HeaderDto,
   ) {
     console.log('====================================');
@@ -74,6 +72,10 @@ export class UserController {
     return this.userService.update(+id, body);
   }
 
+  // @SetMetadata('role', [Role.ADMIN])
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  @UseGuards(jwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
