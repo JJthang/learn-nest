@@ -11,15 +11,18 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RefreshAuthGuard } from 'src/common/guards/refresh-auth/refresh-auth.guard';
 import { jwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard('local'))
   @Post('login')
   create(@Request() req: { user: { id: number } }) {
+    console.log('req : ', req.user);
     return this.authService.login(req.user);
   }
 

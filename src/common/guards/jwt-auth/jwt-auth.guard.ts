@@ -1,26 +1,26 @@
-import {
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { TokenExpiredError } from '@nestjs/jwt';
+import { ExecutionContext, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
+import { IS_PUBLIC_KEY } from 'src/common/decorators/public.decorator';
 
 @Injectable()
 export class jwtAuthGuard extends AuthGuard('jwt') {
-  handleRequest<TUser = any>(
-    err: any,
-    user: TUser,
-    info: any,
-    context: ExecutionContext,
-    status?: any,
-  ): TUser {
-    if (err || !user) {
-      if (info instanceof TokenExpiredError) {
-        throw new UnauthorizedException('Token expired. Please login again.');
-      }
-      throw new UnauthorizedException(info?.message || 'Invalid token');
+  constructor(private reflector: Reflector) {
+    // Gọi super() để khởi tạo AuthGuard gốc.
+    super();
+  }
+
+  canActivate(context: ExecutionContext): boolean {
+    // Kiểm tra xem handler hoặc controller có metadata IS_PUBLIC_KEY không:
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    // Nếu route được đánh dấu là public -> cho phép luôn:
+    if (isPublic) {
+      return true;
     }
-    return user;
+    // Ngược lại, chạy tiếp logic xác thực JWT của AuthGuard gốc:
+    return super.canActivate(context) as boolean;
   }
 }
